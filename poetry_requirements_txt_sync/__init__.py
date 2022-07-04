@@ -30,22 +30,22 @@ def cli():
             typer.echo(f"{__version__}")
             raise typer.Exit()
 
-    def mappings_callback(mappings: List[str]):
-        for mapping in mappings:
+    def pointer_callback(pointer: List[str]):
+        for mapping in pointer:
             if len([i for i, c in enumerate(mapping) if c == ":"]) != 1:
                 raise typer.BadParameter(
                     f"Bad format of {mapping=!r}, expected to find a single ':'"
                 )
-        return mappings
+        return pointer
 
     def _cli(
-        mappings: List[str] = typer.Argument(..., callback=mappings_callback),
+        pointer: List[str] = typer.Option(..., callback=pointer_callback),
         _: Optional[bool] = typer.Option(
             None, "--version", callback=version_callback, is_eager=True
         ),
     ):
         exit_code = 0
-        for extras_name, requirements_txt_path in (m.split(":") for m in mappings):
+        for extras_name, requirements_txt_path in (m.split(":") for m in pointer):
             try:
                 execute_sync_command(
                     extras_name=extras_name,
