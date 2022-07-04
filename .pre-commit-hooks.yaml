@@ -1,0 +1,7 @@
+-   id: poetry-requirements-txt-sync
+    name: Poetry to requirements.txt sync
+    entry: poetry-requirements-txt-sync
+    language: python
+    pass_filenames: false
+    args: []
+    files: 'pyproject.toml|poetry.lock'
