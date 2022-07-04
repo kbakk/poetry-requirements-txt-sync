@@ -1,0 +1,5 @@
+[flake8]
+max-line-length=131
+per-file-ignores =
+    # allow importing into __init__ to make import from module nice
+    __init__.py: F401, F403
