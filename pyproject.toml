@@ -6,11 +6,11 @@ authors = ["Kristoffer Bakkejord"]
 # packages = [""]
 
 [tool.poetry.scripts]
-poetry-requirements-txt-sync = "poetry_requirements_txt_sync:cli"
+poetry-requirements-txt-sync = "poetry_requirements_txt_sync:main"
 
 [tool.poetry.dependencies]
 python = "^3.8"
-typer = "^0.4.2"
+tomli = "^2.0.1"
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.2"

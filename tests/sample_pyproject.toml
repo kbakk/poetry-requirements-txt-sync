@@ -1,0 +1,2 @@
+[tool.poetry-requirements-txt-sync.map]
+sample = "tests/requirements.txt"

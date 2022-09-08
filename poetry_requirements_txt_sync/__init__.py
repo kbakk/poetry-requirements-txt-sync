@@ -1,9 +1,10 @@
 import pathlib
 import subprocess
 import sys
-from typing import List, Optional
 
-__version__ = "0.1.0"
+import tomli
+
+__version__ = "0.2.0"
 
 
 def execute_sync_command(
@@ -22,46 +23,26 @@ def execute_sync_command(
     return
 
 
-def cli():
-    import typer
-
-    def version_callback(value: bool):
-        if value:
-            typer.echo(f"{__version__}")
-            raise typer.Exit()
-
-    def pointer_callback(pointer: List[str]):
-        for mapping in pointer:
-            if len([i for i, c in enumerate(mapping) if c == ":"]) != 1:
-                raise typer.BadParameter(
-                    f"Bad format of {mapping=!r}, expected to find a single ':'"
-                )
-        return pointer
-
-    def _cli(
-        pointer: List[str] = typer.Option(..., callback=pointer_callback),
-        _: Optional[bool] = typer.Option(
-            None, "--version", callback=version_callback, is_eager=True
-        ),
-    ):
-        exit_code = 0
-        for extras_name, requirements_txt_path in (m.split(":") for m in pointer):
-            try:
-                execute_sync_command(
-                    extras_name=extras_name,
-                    requirements_txt_path=pathlib.Path(requirements_txt_path),
-                )
-            except subprocess.CalledProcessError as e:
-                program = e.args[1][0]
-                exit_code = e.args[0]
-                typer.echo(
-                    f"{program} exited with exit code {exit_code}, check output",
-                    err=True,
-                )
-        sys.exit(0)
-
-    typer.run(_cli)
+def main():
+    pyproject_path = "pyproject.toml" if len(sys.argv) == 1 else sys.argv[1]
+    try:
+        with open(pyproject_path, "rb") as fd:
+            pyproject = tomli.load(fd)
+    except OSError as err:
+        print("Error loading pyproject file:", err)
+        sys.exit(10)
+    mapping = (
+        pyproject.get("tool", {}).get("poetry-requirements-txt-sync", {}).get("map")
+    )
+    if mapping and isinstance(mapping, dict):
+        for name, req_path in mapping.items():
+            execute_sync_command(extras_name=name, requirements_txt_path=req_path)
+    else:
+        print(
+            f"Error reading mapping in 'tool.poetry-requirements-txt-sync.map', expected key/value pairs, got {type(mapping)}"
+        )
+        sys.exit(20)
 
 
 if __name__ == "__main__":
-    cli()
+    main()
