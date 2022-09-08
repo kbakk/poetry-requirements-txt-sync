@@ -7,14 +7,14 @@ __version__ = "0.1.0"
 
 
 def execute_sync_command(
-    extras_name: str, requirements_txt_path: pathlib.Path, hashes=False
+    extras_name: str, requirements_txt_path: pathlib.Path, hashes=True
 ):
     cmd = (
         f"poetry export --format=requirements.txt "
         f"--extras {extras_name} "
         f"--output {requirements_txt_path}"
     )
-    if hashes:
+    if hashes is False:
         cmd += " --without-hashes"
     print(cmd)
     run_res = subprocess.run(cmd.split())
